@@ -13,44 +13,46 @@ function validateRouteConfigMap(routeConfigs) {
 
   routeNames.forEach(routeName => {
     const routeConfig = routeConfigs[routeName];
-    const screenComponent = getScreenComponent(routeConfig);
+
+    if (!routeConfig.screen && !routeConfig.getScreen) {
+      throw new Error(
+        `Route '${routeName}' should declare a screen. ` +
+          'For example:\n\n' +
+          "import MyScreen from './MyScreen';\n" +
+          '...\n' +
+          `${routeName}: {\n` +
+          '  screen: MyScreen,\n' +
+          '}'
+      );
+    } else if (routeConfig.screen && routeConfig.getScreen) {
+      throw new Error(
+        `Route '${routeName}' should declare a screen or ` +
+          'a getScreen, not both.'
+      );
+    }
 
     if (
-      !screenComponent ||
-      (typeof screenComponent !== 'function' &&
-        typeof screenComponent !== 'string' &&
-        !routeConfig.getScreen)
+      routeConfig.screen &&
+      typeof routeConfig.screen !== 'function' &&
+      typeof routeConfig.screen !== 'string'
     ) {
       throw new Error(
         `The component for route '${routeName}' must be a ` +
           'React component. For example:\n\n' +
           "import MyScreen from './MyScreen';\n" +
           '...\n' +
-          `${routeName}: MyScreen,\n` +
+          `${routeName}: {\n` +
+          '  screen: MyScreen,\n' +
           '}\n\n' +
           'You can also use a navigator:\n\n' +
           "import MyNavigator from './MyNavigator';\n" +
           '...\n' +
-          `${routeName}: MyNavigator,\n` +
+          `${routeName}: {\n` +
+          '  screen: MyNavigator,\n' +
           '}'
       );
     }
-
-    if (routeConfig.screen && routeConfig.getScreen) {
-      throw new Error(
-        `Route '${routeName}' should declare a screen or ` +
-          'a getScreen, not both.'
-      );
-    }
   });
-}
-
-function getScreenComponent(routeConfig) {
-  if (!routeConfig) {
-    return null;
-  }
-
-  return routeConfig.screen ? routeConfig.screen : routeConfig;
 }
 
 export default validateRouteConfigMap;

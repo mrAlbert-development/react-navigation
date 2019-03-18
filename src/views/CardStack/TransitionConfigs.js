@@ -1,5 +1,5 @@
 import { Animated, Easing, Platform } from 'react-native';
-import StyleInterpolator from './StackViewStyleInterpolator';
+import CardStackStyleInterpolator from './CardStackStyleInterpolator';
 import * as ReactNativeFeatures from '../../utils/ReactNativeFeatures';
 
 let IOSTransitionSpec;
@@ -23,7 +23,7 @@ if (ReactNativeFeatures.supportsImprovedSpringAnimation()) {
 // Standard iOS navigation transition
 const SlideFromRightIOS = {
   transitionSpec: IOSTransitionSpec,
-  screenInterpolator: StyleInterpolator.forHorizontal,
+  screenInterpolator: CardStackStyleInterpolator.forHorizontal,
   containerStyle: {
     backgroundColor: '#000',
   },
@@ -32,7 +32,7 @@ const SlideFromRightIOS = {
 // Standard iOS navigation transition for modals
 const ModalSlideFromBottomIOS = {
   transitionSpec: IOSTransitionSpec,
-  screenInterpolator: StyleInterpolator.forVertical,
+  screenInterpolator: CardStackStyleInterpolator.forVertical,
   containerStyle: {
     backgroundColor: '#000',
   },
@@ -46,7 +46,7 @@ const FadeInFromBottomAndroid = {
     easing: Easing.out(Easing.poly(5)), // decelerate
     timing: Animated.timing,
   },
-  screenInterpolator: StyleInterpolator.forFadeFromBottomAndroid,
+  screenInterpolator: CardStackStyleInterpolator.forFadeFromBottomAndroid,
 };
 
 // Standard Android navigation transition when closing an Activity
@@ -57,12 +57,15 @@ const FadeOutToBottomAndroid = {
     easing: Easing.in(Easing.poly(4)), // accelerate
     timing: Animated.timing,
   },
-  screenInterpolator: StyleInterpolator.forFadeFromBottomAndroid,
+  screenInterpolator: CardStackStyleInterpolator.forFadeFromBottomAndroid,
 };
 
 function defaultTransitionConfig(
+  // props for the new screen
   transitionProps,
+  // props for the old screen
   prevTransitionProps,
+  // whether we're animating in/out a modal screen
   isModal
 ) {
   if (Platform.OS === 'android') {
@@ -86,7 +89,9 @@ function defaultTransitionConfig(
 
 function getTransitionConfig(
   transitionConfigurer,
+  // props for the new screen
   transitionProps,
+  // props for the old screen
   prevTransitionProps,
   isModal
 ) {

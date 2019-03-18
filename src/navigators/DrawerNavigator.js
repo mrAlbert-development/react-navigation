@@ -1,13 +1,13 @@
 import React from 'react';
 import { Dimensions, Platform, ScrollView } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
 
 import createNavigator from './createNavigator';
 import createNavigationContainer from '../createNavigationContainer';
-import DrawerRouter from '../routers/DrawerRouter';
+import TabRouter from '../routers/TabRouter';
 import DrawerScreen from '../views/Drawer/DrawerScreen';
 import DrawerView from '../views/Drawer/DrawerView';
 import DrawerItems from '../views/Drawer/DrawerNavigatorItems';
+import SafeAreaView from '../views/SafeAreaView';
 
 // A stack navigators props are the intersection between
 // the base navigator props (navgiation, screenProps, etc)
@@ -38,6 +38,9 @@ const DefaultDrawerConfig = {
     return Math.min(smallerAxisSize - appBarHeight, maxWidth);
   },
   contentComponent: defaultContentComponent,
+  drawerOpenRoute: 'DrawerOpen',
+  drawerCloseRoute: 'DrawerClose',
+  drawerToggleRoute: 'DrawerToggle',
   drawerPosition: 'left',
   drawerBackgroundColor: 'white',
   useNativeAnimations: true,
@@ -45,25 +48,58 @@ const DefaultDrawerConfig = {
 
 const DrawerNavigator = (routeConfigs, config = {}) => {
   const mergedConfig = { ...DefaultDrawerConfig, ...config };
-
   const {
-    order,
-    paths,
-    initialRouteName,
-    backBehavior,
-    ...drawerConfig
+    containerConfig,
+    drawerWidth,
+    drawerLockMode,
+    contentComponent,
+    contentOptions,
+    drawerPosition,
+    useNativeAnimations,
+    drawerBackgroundColor,
+    drawerOpenRoute,
+    drawerCloseRoute,
+    drawerToggleRoute,
+    ...tabsConfig
   } = mergedConfig;
 
-  const routerConfig = {
-    order,
-    paths,
-    initialRouteName,
-    backBehavior,
-  };
+  const contentRouter = TabRouter(routeConfigs, tabsConfig);
+  const drawerRouter = TabRouter(
+    {
+      [drawerCloseRoute]: {
+        screen: createNavigator(contentRouter, routeConfigs, config)(props => (
+          <DrawerScreen {...props} />
+        )),
+      },
+      [drawerOpenRoute]: {
+        screen: () => null,
+      },
+      [drawerToggleRoute]: {
+        screen: () => null,
+      },
+    },
+    {
+      initialRouteName: drawerCloseRoute,
+    }
+  );
 
-  const drawerRouter = DrawerRouter(routeConfigs, routerConfig);
-
-  const navigator = createNavigator(DrawerView, drawerRouter, drawerConfig);
+  const navigator = createNavigator(drawerRouter, routeConfigs, config)(
+    props => (
+      <DrawerView
+        {...props}
+        drawerBackgroundColor={drawerBackgroundColor}
+        drawerLockMode={drawerLockMode}
+        useNativeAnimations={useNativeAnimations}
+        drawerWidth={drawerWidth}
+        contentComponent={contentComponent}
+        contentOptions={contentOptions}
+        drawerPosition={drawerPosition}
+        drawerOpenRoute={drawerOpenRoute}
+        drawerCloseRoute={drawerCloseRoute}
+        drawerToggleRoute={drawerToggleRoute}
+      />
+    )
+  );
 
   return createNavigationContainer(navigator);
 };

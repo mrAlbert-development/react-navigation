@@ -42,7 +42,9 @@
     "react/forbid-prop-types": "warn",
     "react/prop-types": "off",
     "react/require-default-props": "off",
-    "react/no-unused-prop-types": "off"
+    "react/no-unused-prop-types": "off",
+  },
+  "settings": {
   },
   "parserOptions": {
     "ecmaVersion": 6,

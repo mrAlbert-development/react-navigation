@@ -8,11 +8,10 @@ import type {
 } from 'react-navigation';
 
 import React from 'react';
-import { Platform, ScrollView, StatusBar, View } from 'react-native';
-import { SafeAreaView, createBottomTabNavigator } from 'react-navigation';
+import { Button, Platform, ScrollView, StatusBar, View } from 'react-native';
+import { SafeAreaView, TabNavigator } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SampleText from './SampleText';
-import { Button } from './commonComponents/ButtonWithMargin';
 
 const MyNavScreen = ({ navigation, banner }) => (
   <SafeAreaView forceInset={{ horizontal: 'always', top: 'always' }}>
@@ -144,7 +143,7 @@ MySettingsScreen.navigationOptions = {
   ),
 };
 
-const SimpleTabs = createBottomTabNavigator(
+const SimpleTabs = TabNavigator(
   {
     Home: {
       screen: MyHomeScreen,
