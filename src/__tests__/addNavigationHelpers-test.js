@@ -6,6 +6,32 @@ const dummyEventSubscriber = (name: string, handler: (*) => void) => ({
 });
 
 describe('addNavigationHelpers', () => {
+  it('handles dismiss action', () => {
+    const mockedDispatch = jest
+      .fn(() => false)
+      .mockImplementationOnce(() => true);
+    const child = { key: 'A', routeName: 'Home' };
+    expect(
+      addNavigationHelpers({
+        state: child,
+        dispatch: mockedDispatch,
+        addListener: dummyEventSubscriber,
+        dangerouslyGetParent: () => ({
+          state: {
+            key: 'P',
+            routeName: 'Parent',
+            routes: [child],
+          },
+        }),
+      }).dismiss()
+    ).toEqual(true);
+    expect(mockedDispatch).toBeCalledWith({
+      type: NavigationActions.BACK,
+      key: 'P',
+    });
+    expect(mockedDispatch.mock.calls.length).toBe(1);
+  });
+
   it('handles Back action', () => {
     const mockedDispatch = jest
       .fn(() => false)
@@ -75,5 +101,44 @@ describe('addNavigationHelpers', () => {
       params: { notificationsEnabled: 'yes' },
     });
     expect(mockedDispatch.mock.calls.length).toBe(1);
+  });
+
+  it('handles GetParams action', () => {
+    const mockedDispatch = jest
+      .fn(() => false)
+      .mockImplementationOnce(() => true);
+    expect(
+      addNavigationHelpers({
+        state: { key: 'B', routeName: 'Settings', params: { name: 'Peter' } },
+        dispatch: mockedDispatch,
+        addListener: dummyEventSubscriber,
+      }).getParam('name', 'Brent')
+    ).toEqual('Peter');
+  });
+
+  it('handles GetParams action with default param', () => {
+    const mockedDispatch = jest
+      .fn(() => false)
+      .mockImplementationOnce(() => true);
+    expect(
+      addNavigationHelpers({
+        state: { key: 'B', routeName: 'Settings' },
+        dispatch: mockedDispatch,
+        addListener: dummyEventSubscriber,
+      }).getParam('name', 'Brent')
+    ).toEqual('Brent');
+  });
+
+  it('handles GetParams action with param value as null', () => {
+    const mockedDispatch = jest
+      .fn(() => false)
+      .mockImplementationOnce(() => true);
+    expect(
+      addNavigationHelpers({
+        state: { key: 'B', routeName: 'Settings', params: { name: null } },
+        dispatch: mockedDispatch,
+        addListener: dummyEventSubscriber,
+      }).getParam('name')
+    ).toEqual(null);
   });
 });

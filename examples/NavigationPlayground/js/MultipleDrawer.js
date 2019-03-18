@@ -3,18 +3,16 @@
  */
 
 import React from 'react';
-import { Button, Platform, ScrollView, StyleSheet } from 'react-native';
-import { DrawerNavigator } from 'react-navigation';
+import { Platform, ScrollView, StyleSheet } from 'react-native';
+import { createDrawerNavigator } from 'react-navigation';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import SampleText from './SampleText';
+import { Button } from './commonComponents/ButtonWithMargin';
 
 const MyNavScreen = ({ navigation, banner }) => (
   <ScrollView style={styles.container}>
     <SampleText>{banner}</SampleText>
-    <Button
-      onPress={() => navigation.navigate('DrawerOpen')}
-      title="Open drawer"
-    />
+    <Button onPress={() => navigation.openDrawer()} title="Open drawer" />
     <Button onPress={() => navigation.goBack(null)} title="Go back" />
   </ScrollView>
 );
@@ -43,7 +41,7 @@ DraftsScreen.navigationOptions = {
   ),
 };
 
-const DrawerExample = DrawerNavigator(
+const DrawerExample = createDrawerNavigator(
   {
     Inbox: {
       path: '/',
@@ -55,9 +53,6 @@ const DrawerExample = DrawerNavigator(
     },
   },
   {
-    drawerOpenRoute: 'DrawerOpen',
-    drawerCloseRoute: 'DrawerClose',
-    drawerToggleRoute: 'DrawerToggle',
     initialRouteName: 'Drafts',
     contentOptions: {
       activeTintColor: '#e91e63',
@@ -65,14 +60,10 @@ const DrawerExample = DrawerNavigator(
   }
 );
 
-const MainDrawerExample = DrawerNavigator({
+const MainDrawerExample = createDrawerNavigator({
   Drafts: {
     screen: DrawerExample,
   },
-}, {
-    drawerOpenRoute: 'DrawerOpen',
-    drawerCloseRoute: 'DrawerClose',
-    drawerToggleRoute: 'DrawerToggle',
 });
 
 const styles = StyleSheet.create({

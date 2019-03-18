@@ -4,18 +4,46 @@
 
 import type {
   NavigationScreenProp,
+  NavigationState,
+  NavigationStateRoute,
   NavigationEventSubscription,
 } from 'react-navigation';
 
 import * as React from 'react';
-import { Button, ScrollView, StatusBar } from 'react-native';
-import { StackNavigator, SafeAreaView } from 'react-navigation';
+import { ScrollView, StatusBar } from 'react-native';
+import {
+  createStackNavigator,
+  SafeAreaView,
+  withNavigation,
+} from 'react-navigation';
 import SampleText from './SampleText';
+import { Button } from './commonComponents/ButtonWithMargin';
+import { HeaderButtons } from './commonComponents/HeaderButtons';
 
 type MyNavScreenProps = {
-  navigation: NavigationScreenProp<*>,
+  navigation: NavigationScreenProp<NavigationState>,
   banner: React.Node,
 };
+
+type BackButtonProps = {
+  navigation: NavigationScreenProp<NavigationStateRoute>,
+};
+
+class MyBackButton extends React.Component<BackButtonProps, any> {
+  render() {
+    return (
+      <HeaderButtons>
+        <HeaderButtons.Item title="Back" onPress={this._navigateBack} />
+      </HeaderButtons>
+    );
+  }
+
+  _navigateBack = () => {
+    this.props.navigation.goBack(null);
+  };
+}
+
+const MyBackButtonWithNavigation = withNavigation(MyBackButton);
 
 class MyNavScreen extends React.Component<MyNavScreenProps> {
   render() {
@@ -37,7 +65,8 @@ class MyNavScreen extends React.Component<MyNavScreenProps> {
         />
         <Button onPress={() => navigation.popToTop()} title="Pop to top" />
         <Button onPress={() => navigation.pop()} title="Pop" />
-        <Button onPress={() => navigation.goBack(null)} title="Go back" />
+        <Button onPress={() => navigation.goBack()} title="Go back" />
+        <Button onPress={() => navigation.dismiss()} title="Dismiss" />
         <StatusBar barStyle="default" />
       </SafeAreaView>
     );
@@ -45,7 +74,7 @@ class MyNavScreen extends React.Component<MyNavScreenProps> {
 }
 
 type MyHomeScreenProps = {
-  navigation: NavigationScreenProp<*>,
+  navigation: NavigationScreenProp<NavigationState>,
 };
 
 class MyHomeScreen extends React.Component<MyHomeScreenProps> {
@@ -89,11 +118,12 @@ class MyHomeScreen extends React.Component<MyHomeScreenProps> {
 }
 
 type MyPhotosScreenProps = {
-  navigation: NavigationScreenProp<*>,
+  navigation: NavigationScreenProp<NavigationState>,
 };
 class MyPhotosScreen extends React.Component<MyPhotosScreenProps> {
   static navigationOptions = {
     title: 'Photos',
+    headerLeft: <MyBackButtonWithNavigation />,
   };
   _s0: NavigationEventSubscription;
   _s1: NavigationEventSubscription;
@@ -129,7 +159,7 @@ class MyPhotosScreen extends React.Component<MyPhotosScreenProps> {
     const { navigation } = this.props;
     return (
       <MyNavScreen
-        banner={`${navigation.state.params.name}'s Photos`}
+        banner={`${navigation.getParam('name')}'s Photos`}
         navigation={navigation}
       />
     );
@@ -138,9 +168,9 @@ class MyPhotosScreen extends React.Component<MyPhotosScreenProps> {
 
 const MyProfileScreen = ({ navigation }) => (
   <MyNavScreen
-    banner={`${navigation.state.params.mode === 'edit' ? 'Now Editing ' : ''}${
-      navigation.state.params.name
-    }'s Profile`}
+    banner={`${
+      navigation.getParam('mode') === 'edit' ? 'Now Editing ' : ''
+    }${navigation.getParam('name')}'s Profile`}
     navigation={navigation}
   />
 );
@@ -155,17 +185,19 @@ MyProfileScreen.navigationOptions = props => {
     // Render a button on the right side of the header.
     // When pressed switches the screen to edit mode.
     headerRight: (
-      <Button
-        title={params.mode === 'edit' ? 'Done' : 'Edit'}
-        onPress={() =>
-          setParams({ mode: params.mode === 'edit' ? '' : 'edit' })
-        }
-      />
+      <HeaderButtons>
+        <HeaderButtons.Item
+          title={params.mode === 'edit' ? 'Done' : 'Edit'}
+          onPress={() =>
+            setParams({ mode: params.mode === 'edit' ? '' : 'edit' })
+          }
+        />
+      </HeaderButtons>
     ),
   };
 };
 
-const SimpleStack = StackNavigator({
+const SimpleStack = createStackNavigator({
   Home: {
     screen: MyHomeScreen,
   },

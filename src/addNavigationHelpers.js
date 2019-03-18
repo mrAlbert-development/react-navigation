@@ -2,10 +2,10 @@
 
 import NavigationActions from './NavigationActions';
 import invariant from './utils/invariant';
-
 export default function(navigation) {
   return {
     ...navigation,
+    // Go back from the given key, default to active key
     goBack: key => {
       let actualizedKey = key;
       if (key === undefined && navigation.state.key) {
@@ -18,6 +18,18 @@ export default function(navigation) {
       return navigation.dispatch(
         NavigationActions.back({ key: actualizedKey })
       );
+    },
+    // Go back from the parent key. If this is a nested stack, the entire
+    // stack will be dismissed.
+    dismiss: () => {
+      let parent = navigation.dangerouslyGetParent();
+      if (parent && parent.state) {
+        return navigation.dispatch(
+          NavigationActions.back({ key: parent.state.key })
+        );
+      } else {
+        return false;
+      }
     },
     navigate: (navigateTo, params, action) => {
       if (typeof navigateTo === 'string') {
@@ -61,6 +73,16 @@ export default function(navigation) {
       return navigation.dispatch(NavigationActions.setParams({ params, key }));
     },
 
+    getParam: (paramName, defaultValue) => {
+      const params = navigation.state.params;
+
+      if (params && paramName in params) {
+        return params[paramName];
+      }
+
+      return defaultValue;
+    },
+
     push: (routeName, params, action) =>
       navigation.dispatch(
         NavigationActions.push({ routeName, params, action })
@@ -75,5 +97,9 @@ export default function(navigation) {
           key: navigation.state.key,
         })
       ),
+
+    openDrawer: () => navigation.dispatch(NavigationActions.openDrawer()),
+    closeDrawer: () => navigation.dispatch(NavigationActions.closeDrawer()),
+    toggleDrawer: () => navigation.dispatch(NavigationActions.toggleDrawer()),
   };
 }
