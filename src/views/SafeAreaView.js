@@ -155,13 +155,13 @@ class SafeView extends Component {
       if (realY >= HEIGHT) {
         realY = realY % HEIGHT;
       } else if (realY < 0) {
-        realY = realY % HEIGHT + HEIGHT;
+        realY = (realY % HEIGHT) + HEIGHT;
       }
 
       if (realX >= WIDTH) {
         realX = realX % WIDTH;
       } else if (realX < 0) {
-        realX = realX % WIDTH + WIDTH;
+        realX = (realX % WIDTH) + WIDTH;
       }
 
       const touchesTop = realY === 0;

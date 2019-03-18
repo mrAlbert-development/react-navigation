@@ -48,8 +48,8 @@ class TabBarBottom extends React.PureComponent {
     const { routes } = navigation.state;
     // Prepend '-1', so there are always at least 2 items in inputRange
     const inputRange = [-1, ...routes.map((x, i) => i)];
-    const outputRange = inputRange.map(
-      inputIndex => (inputIndex === index ? activeTintColor : inactiveTintColor)
+    const outputRange = inputRange.map(inputIndex =>
+      inputIndex === index ? activeTintColor : inactiveTintColor
     );
     const color = position.interpolate({
       inputRange,
@@ -211,11 +211,10 @@ class TabBarBottom extends React.PureComponent {
             const focused = index === navigation.state.index;
             const scene = { route, index, focused };
             const onPress = getOnPress(previousScene, scene);
-            const outputRange = inputRange.map(
-              inputIndex =>
-                inputIndex === index
-                  ? activeBackgroundColor
-                  : inactiveBackgroundColor
+            const outputRange = inputRange.map(inputIndex =>
+              inputIndex === index
+                ? activeBackgroundColor
+                : inactiveBackgroundColor
             );
             const backgroundColor = position.interpolate({
               inputRange,
